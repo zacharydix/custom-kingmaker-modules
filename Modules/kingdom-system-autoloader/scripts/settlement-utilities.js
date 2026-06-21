@@ -189,7 +189,7 @@ if (globalThis.settlementUtilitiesLoaded) {
   });
 
   document.addEventListener("click", async (event) => {
-    const button = event.target.closest?.(".settlement-create");
+    const button = event.target.closest?.("button.settlement-create[data-action='create-settlement']");
     if (!button) return;
 
     if (!game.user.isGM) {

@@ -65,9 +65,6 @@ new Dialog({
           name,
           type: "loot",
           img: config.img,
-          permission: {
-            default: CONST.DOCUMENT_PERMISSION_LEVELS.OBSERVER
-          },
           flags: {
             world: {
               isSettlement: true,

@@ -202,64 +202,7 @@ function focusMeetsRequirement(focus, settlementType) {
 }
 
 if (!initialized) {
-  if (!isGM) {
-    return ui.notifications.warn("This actor has not been initialized as a settlement yet.");
-  }
-
-  return new Dialog({
-    title: "Initialize Settlement",
-    content: `
-      <form>
-        <p>
-          Initialize <strong>${actor.name}</strong> as a settlement?
-        </p>
-
-        <div class="form-group">
-          <label>Settlement Type</label>
-          <select id="settlement-type">${makeTypeOptions("Village")}</select>
-        </div>
-
-        <div class="form-group">
-          <label>Starting Development</label>
-          <input id="development" type="number" value="0" min="0">
-        </div>
-      </form>
-    `,
-    buttons: {
-      initialize: {
-        label: "Initialize",
-        callback: async (html) => {
-          const settlementType = html.find("#settlement-type").val();
-          const development = Number(html.find("#development").val());
-
-          if (!Number.isFinite(development) || development < 0) {
-            return ui.notifications.error("Development must be 0 or higher.");
-          }
-
-          await actor.setFlag("world", "isSettlement", true);
-          await actor.setFlag("world", "settlementType", settlementType);
-          await actor.setFlag("world", "development", development);
-          await actor.setFlag("world", "foci", []);
-
-          await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor }),
-            content: `
-              <div style="line-height:1.25;">
-                <strong>Settlement Initialized</strong><br>
-                <small>${actor.name}</small>
-                <hr style="margin:4px 0;">
-                Type: <strong>${settlementType}</strong><br>
-                Development: <strong>${development}</strong><br>
-                ${getUpgradeText(settlementType, development)}<br>
-                Foci: <em>None</em>
-              </div>
-            `
-          });
-        }
-      }
-    },
-    default: "initialize"
-  }).render(true);
+  return ui.notifications.warn("Please select an already-initialized settlement token.");
 }
 
 const settlementType = actor.getFlag("world", "settlementType") ?? "Village";

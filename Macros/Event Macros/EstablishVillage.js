@@ -92,17 +92,14 @@ new Dialog({
             outcome = "Success";
             result = `
               You establish a new village.<br>
-              <button class="settlement-create">Create Settlement</button>`;
+              <button type="button" class="settlement-create" data-action="create-settlement">Create Settlement</button>`;
             break;
 
           case 2:
             outcome = "Success";
             result = `
               You establish a new village.<br>
-              <button class="settlement-create">Create Settlement</button>`;
-            break;
-
-          case 1:
+              <button type="button" class="settlement-create" data-action="create-settlement">Create Settlement</button>`;
             outcome = "Failure";
             result = `
               You gain 1 Unrest.<br>

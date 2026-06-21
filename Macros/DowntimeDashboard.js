@@ -223,11 +223,9 @@ DowntimeSystem.postPendingEarnIncomeCard = async function(data) {
       <p><strong>Skill:</strong> ${data.skillLabel} (${data.proficiencyLabel})</p>
       <p><strong>Task Level:</strong> ${data.taskLevel}</p>
       <p><strong>DC:</strong> ${data.dc}</p>
-      <p><em>Resolve any Hero Point rerolls first, then GM clicks Calculate Earn Income.</em></p>
+      <p><em>Resolve any Hero Point rerolls first, then click Calculate Earn Income.</em></p>
 
-      <button type="button" class="downtime-calculate-pending-earned-income" ${game.user.isGM ? "" : "disabled"}>
-        Calculate Earn Income
-      </button>
+      <div class="downtime-pending-earned-income-actions"></div>
     </div>
   `;
 
@@ -284,7 +282,6 @@ DowntimeSystem.postEarnIncomeChat = async function(data) {
 
       <button type="button"
         class="downtime-pay-earned-income"
-        ${game.user.isGM ? "" : "disabled"}
         style="margin-top: 6px;">
         Pay Character
       </button>
@@ -306,7 +303,8 @@ if (DowntimeSystem._chatHookVersion !== DowntimeSystem.VERSION) {
   DowntimeSystem._chatHookVersion = DowntimeSystem.VERSION;
 
   Hooks.on("renderChatMessageHTML", (message, html) => {
-    const card = html.querySelector?.(".downtime-earn-income-card");
+    const $html = html?.jquery ? html : $(html);
+    const card = $html.find(".downtime-earn-income-card")[0];
     if (!card) return;
 
     const dailyIncomeCp = Number(card.dataset.dailyIncomeCp ?? 0);
@@ -325,11 +323,6 @@ if (DowntimeSystem._chatHookVersion !== DowntimeSystem.VERSION) {
     input?.addEventListener("input", updatePreview);
 
     payButton?.addEventListener("click", async () => {
-      if (!game.user.isGM) {
-        ui.notifications.warn("Only the GM can pay Earn Income rewards.");
-        return;
-      }
-
       const actor = game.actors.get(card.dataset.actorId);
       if (!actor) {
         ui.notifications.error("Could not find the actor to pay.");
@@ -356,16 +349,18 @@ if (DowntimeSystem._chatHookVersion !== DowntimeSystem.VERSION) {
   });
 
   Hooks.on("renderChatMessageHTML", (message, html) => {
-    const button = html.querySelector?.(".downtime-calculate-pending-earned-income");
-    if (!button) return;
+    const $html = html?.jquery ? html : $(html);
+    const actionsContainer = $html.find(".downtime-pending-earned-income-actions")[0];
+    if (!actionsContainer) return;
 
+    actionsContainer.textContent = "";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "downtime-calculate-pending-earned-income";
+    button.textContent = "Calculate Earn Income";
     button.addEventListener("click", async () => {
-      if (!game.user.isGM) {
-        ui.notifications.warn("Only the GM can calculate Earn Income.");
-        return;
-      }
-
-      const card = html.querySelector(".downtime-pending-earn-income");
+      const card = $html.find(".downtime-pending-earn-income")[0];
       const actorId = card.dataset.actorId;
       const actor = game.actors.get(actorId);
 
@@ -425,6 +420,8 @@ if (DowntimeSystem._chatHookVersion !== DowntimeSystem.VERSION) {
 
       await message.update({ content: card.outerHTML });
     });
+
+    actionsContainer.appendChild(button);
   });
 }
 

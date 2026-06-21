@@ -4,6 +4,6 @@
 
 ## Features
 - [ ] Implement unrest debuff
-- [ ] Show skill bonus on roll shows
-- [ ] Make action macros automatically select assigned character
+- [x] Show skill bonus on roll shows
+- [x] Make action macros automatically select assigned character
 - [ ] Make the settlement tooltip show the small description on Foci

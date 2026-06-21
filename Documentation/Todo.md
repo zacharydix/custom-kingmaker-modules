@@ -1,8 +1,9 @@
 ## Bugs
 - [x] Tooltip settlement hook not showing
-- [ ] Calculate button for Earn Income not working for GM after player rolls
+- [x] Calculate button for Earn Income not working for GM after player rolls
 
 ## Features
 - [ ] Implement unrest debuff
 - [ ] Show skill bonus on roll shows
 - [ ] Make action macros automatically select assigned character
+- [ ] Make the settlement tooltip show the small description on Foci

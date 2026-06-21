@@ -519,7 +519,6 @@ class DowntimeDashboard extends Application {
 
         <h3>Coming Soon</h3>
         <button disabled>Craft</button>
-        <button disabled>Retrain</button>
       </div>
     `);
   }

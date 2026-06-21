@@ -1,16 +1,20 @@
 const selectedTokens = canvas.tokens.controlled;
+let actor = null;
 
-if (!selectedTokens.length) {
-  return ui.notifications.warn("Please select the character token making the check.");
+if (selectedTokens.length) {
+  const token = selectedTokens.find(t => !t.actor?.getFlag("world", "isSettlement"));
+  if (token) {
+    actor = token.actor;
+  }
 }
 
-const token = selectedTokens.find(t => !t.actor?.getFlag("world", "isSettlement"));
-
-if (!token) {
-  return ui.notifications.warn("Please select a non-settlement token to make the check.");
+if (!actor) {
+  actor = game.user.character;
 }
 
-const actor = token.actor;
+if (!actor) {
+  return ui.notifications.warn("Please select a character token or assign yourself a character.");
+}
 const kingdom = game.actors.getName("Kingdom");
 
 if (!kingdom) {
@@ -45,7 +49,16 @@ const skills = {
 };
 
 const options = Object.entries(skills)
-  .map(([slug, label]) => `<option value="${slug}">${label}</option>`)
+  .map(([slug, data]) => {
+    const label = typeof data === "string" ? data : data.label;
+    const skillData = actor?.system?.skills?.[slug];
+    const rank = skillData?.rank ?? 0;
+    const value = skillData?.totalModifier ?? skillData?.value ?? 0;
+    const rankLabel = (typeof DowntimeSystem !== "undefined" && DowntimeSystem.rankToLabel)
+      ? DowntimeSystem.rankToLabel(rank)
+      : (rank ? ["Trained","Expert","Master","Legendary"][rank-1] ?? "Trained" : "Untrained");
+    return `<option value="${slug}">${label} — ${rankLabel} (+${value})</option>`;
+  })
   .join("");
 
 new Dialog({

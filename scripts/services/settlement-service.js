@@ -35,4 +35,13 @@ export class SettlementService {
   static getTypes() {
     return SETTLEMENT_TYPES;
   }
+
+  static getNextType(settlementType) {
+    const types = this.getTypes();
+    const index = types.indexOf(settlementType);
+
+    if (index === -1) return null;
+
+    return types[index + 1] ?? null;
+  }
 }

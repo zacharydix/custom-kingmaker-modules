@@ -20,92 +20,7 @@ export async function openSettlementDashboard() {
 
   const isGM = game.user.isGM;
 
-  const FOCI = [
-    'Alchemical Lab',
-    'Arcanum Guild',
-    'Artisan’s Guild',
-    'Bazaar',
-    'Caravansarai',
-    'Casino',
-    'Castle',
-    'Circus',
-    'Druids’ Grove',
-    'Exorcists Extraordinaire',
-    'Farming Initiative',
-    'Famous Tavern',
-    'Gold Mine',
-    'Healing Houses',
-    'Hunter’s Lodge',
-    'Library',
-    'Magical Crafter',
-    'Marvelous Marketplace',
-    'Master Blacksmith',
-    'Mint',
-    'Monument',
-    'Museum of the Ancient Arcane',
-    'Palace',
-    'Potion Seller',
-    'Printing Press',
-    'Public Forum',
-    'Scenic Retreat',
-    'Temple District',
-    'Thieves’ Guild',
-    'Training Ground',
-    'Training Hospital',
-    'University',
-    'Walls',
-  ];
-
-  const SETTLEMENT_RANK = {
-    Village: 0,
-    Town: 1,
-    City: 2,
-    Metropolis: 3,
-  };
-
-  const FOCUS_REQUIREMENTS = {
-    'Alchemical Lab': 'Town',
-    Castle: 'Town',
-    'Gold Mine': 'Town',
-    'Magical Crafter': 'Town',
-    'Master Blacksmith': 'Town',
-    'Potion Seller': 'Town',
-    'Scenic Retreat': 'Town',
-
-    Library: 'City',
-    'Marvelous Marketplace': 'City',
-    Mint: 'City',
-    Monument: 'City',
-    'Public Forum': 'City',
-    Bazaar: 'City',
-
-    Palace: 'Metropolis',
-    University: 'Metropolis',
-  };
-
-  const REPEATABLE_FOCI = ['Castle', 'Walls'];
-
-  const SETTLEMENT_CONFIG = {
-    Village: {
-      img: 'assets/Settlements/Village.png',
-    },
-    Town: {
-      img: 'assets/Settlements/Town.png',
-    },
-    City: {
-      img: 'assets/Settlements/City.png',
-    },
-    Metropolis: {
-      img: 'assets/Settlements/Metropolis.png',
-    },
-  };
-
-  const NEXT_SETTLEMENT_TYPE = {
-    Village: 'Town',
-    Town: 'City',
-    City: 'Metropolis',
-    Metropolis: null,
-  };
+  const SETTLEMENT_CONFIG = SettlementService.getConfig();
 
   const initialized = actor.getFlag('world', 'isSettlement') === true;
 
@@ -121,20 +36,6 @@ export async function openSettlementDashboard() {
           `<option value="${type}" ${type === currentType ? 'selected' : ''}>${type}</option>`
       )
       .join('');
-  }
-
-  function getFocusLabel(focus) {
-    const parts = [];
-
-    if (FOCUS_REQUIREMENTS[focus]) {
-      parts.push(FOCUS_REQUIREMENTS[focus]);
-    }
-
-    if (REPEATABLE_FOCI.includes(focus)) {
-      parts.push('Repeatable');
-    }
-
-    return parts.length ? `${focus} (${parts.join(', ')})` : focus;
   }
 
   function makeFocusOptions(currentFocusId) {
@@ -178,26 +79,19 @@ export async function openSettlementDashboard() {
     return `<strong>Upgrade:</strong> ${development} / ${required}`;
   }
 
-  function getSettlementActors() {
-    return game.actors.filter((actor) => actor.getFlag('world', 'isSettlement'));
-  }
-
-  function getFocusConflict(focus, currentActor) {
-    if (!focus || REPEATABLE_FOCI.includes(focus)) return null;
+  function getFocusConflict(focusId, currentActor) {
+    if (!focusId || FocusService.isRepeatable(focusId)) return null;
 
     return SettlementService.getAllSettlements().find((actor) => {
       if (actor.id === currentActor.id) return false;
 
-      const foci = actor.getFlag('world', 'foci') ?? [];
-      return foci.includes(focus);
+      const foci = SettlementService.getFoci(actor);
+      return foci.includes(focusId);
     });
   }
 
-  function focusMeetsRequirement(focus, settlementType) {
-    const requirement = FOCUS_REQUIREMENTS[focus];
-    if (!requirement) return true;
-
-    return SETTLEMENT_RANK[settlementType] >= SETTLEMENT_RANK[requirement];
+  function focusMeetsRequirement(focusId, settlementType) {
+    return FocusService.meetsSettlementRequirement(focusId, settlementType);
   }
 
   if (!initialized) {
@@ -262,7 +156,7 @@ export async function openSettlementDashboard() {
     <hr>
     <p>
       <strong>Settlement Upgrade Available</strong><br>
-      ${settlementType} → ${NEXT_SETTLEMENT_TYPE[settlementType]}
+      ${settlementType} → ${SettlementService.getNextType(settlementType)}
     </p>
   `
       : '';
@@ -321,12 +215,14 @@ export async function openSettlementDashboard() {
           const conflict = getFocusConflict(focus, actor);
 
           if (conflict) {
-            return ui.notifications.error(`${focus} is already assigned to ${conflict.name}.`);
+            return ui.notifications.error(
+              `${FocusService.getName(focus)} is already assigned to ${conflict.name}.`
+            );
           }
 
           if (!focusMeetsRequirement(focus, newType)) {
             return ui.notifications.error(
-              `${focus} requires a ${FOCUS_REQUIREMENTS[focus]} or larger settlement.`
+              `${FocusService.getName(focus)} requires a ${FocusService.getMinimumSettlementType(focus)} or larger settlement.`
             );
           }
         }
@@ -383,7 +279,7 @@ export async function openSettlementDashboard() {
       buttons.upgrade = {
         label: 'Upgrade',
         callback: async () => {
-          const nextType = NEXT_SETTLEMENT_TYPE[settlementType];
+          const nextType = SettlementService.getNextType(settlementType);
 
           if (!nextType) {
             return ui.notifications.warn('This settlement is already at maximum tier.');

@@ -1,8 +1,9 @@
 // scripts/main.js
 
 import { KINGDOM_DC_BY_LEVEL } from "./data/kingdom-data.js";
-
 import { FOCI, FOCUS_IDS } from "./data/focus-data.js";
+import { FocusService } from "./services/focus-service.js";
+import { SettlementService } from "./services/settlement-service.js";
 
 import {
   SETTLEMENT_DEVELOPMENT_REQUIREMENTS,
@@ -17,10 +18,15 @@ Hooks.once("ready", () => {
   console.log("Kingmaker Toolkit | Ready");
 
   console.log(
-    "Kingmaker Toolkit | Artisan's Guild:",
-    FOCI[FOCUS_IDS.ARTISANS_GUILD]
+    "Kingmaker Toolkit | Settlements:",
+    SettlementService.getAllSettlements().map(s => ({
+      name: s.name,
+      type: SettlementService.getType(s),
+      development: SettlementService.getDevelopment(s),
+      foci: SettlementService.getFoci(s),
+      ready: SettlementService.isReadyToUpgrade(s)
+    }))
   );
-
 
   game.kingmakerToolkit = {
     version: game.modules.get("kingmaker-toolkit")?.version ?? "unknown",

@@ -9,14 +9,18 @@ import {
   SETTLEMENT_TYPES
 } from "./data/settlement-data.js";
 
-import { EARN_INCOME_FOCI } from "./data/earn-income-data.js";
-
 Hooks.once("init", () => {
   console.log("Kingmaker Toolkit | Initializing");
 });
 
 Hooks.once("ready", () => {
   console.log("Kingmaker Toolkit | Ready");
+
+  console.log(
+    "Kingmaker Toolkit | Artisan's Guild:",
+    FOCI[FOCUS_IDS.ARTISANS_GUILD]
+  );
+
 
   game.kingmakerToolkit = {
     version: game.modules.get("kingmaker-toolkit")?.version ?? "unknown",

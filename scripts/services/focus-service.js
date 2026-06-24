@@ -1,10 +1,10 @@
-import { FOCI } from "../data/focus-data.js";
+import { FOCI } from '../data/focus-data.js';
 
 const SETTLEMENT_RANK = {
   Village: 0,
   Town: 1,
   City: 2,
-  Metropolis: 3
+  Metropolis: 3,
 };
 
 export class FocusService {
@@ -21,11 +21,11 @@ export class FocusService {
   }
 
   static getByName(name) {
-    return this.getAll().find(focus => focus.name === name) ?? null;
+    return this.getAll().find((focus) => focus.name === name) ?? null;
   }
 
   static getNames() {
-    return this.getAll().map(focus => focus.name);
+    return this.getAll().map((focus) => focus.name);
   }
 
   static isRepeatable(nameOrId) {
@@ -35,7 +35,7 @@ export class FocusService {
 
   static getMinimumSettlementType(nameOrId) {
     const focus = this.getById(nameOrId) ?? this.getByName(nameOrId);
-    return focus?.minimumSettlementType ?? "Village";
+    return focus?.minimumSettlementType ?? 'Village';
   }
 
   static meetsSettlementRequirement(nameOrId, settlementType) {
@@ -51,22 +51,24 @@ export class FocusService {
 
     const parts = [];
 
-    if (focus.minimumSettlementType && focus.minimumSettlementType !== "Village") {
+    if (focus.minimumSettlementType && focus.minimumSettlementType !== 'Village') {
       parts.push(focus.minimumSettlementType);
     }
 
     if (focus.repeatable) {
-      parts.push("Repeatable");
+      parts.push('Repeatable');
     }
 
-    return parts.length
-      ? `${focus.name} (${parts.join(", ")})`
-      : focus.name;
+    return parts.length ? `${focus.name} (${parts.join(', ')})` : focus.name;
   }
 
   static getSortedNames() {
-    return this.getNames().sort((a, b) =>
-      a.localeCompare(b)
-    );
+    return this.getNames().sort((a, b) => a.localeCompare(b));
+  }
+
+  static normalizeName(name) {
+    return String(name ?? '')
+      .replace(/’/g, "'")
+      .trim();
   }
 }

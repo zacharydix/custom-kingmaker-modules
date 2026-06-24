@@ -1,3 +1,6 @@
 {
-    "CodeGPT.apiKey": "OpenAI"
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
 }

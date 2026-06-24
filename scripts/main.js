@@ -1,32 +1,33 @@
 // scripts/main.js
 
-import { KingdomService } from "./services/kingdom-service.js";
-import { SettlementService } from "./services/settlement-service.js";
-import { FocusService } from "./services/focus-service.js";
-import { openSettlementDashboard } from "./apps/settlement-dashboard.js";
-import { FOCI, FOCUS_IDS } from "./data/focus-data.js";
+import { KingdomService } from './services/kingdom-service.js';
+import { SettlementService } from './services/settlement-service.js';
+import { FocusService } from './services/focus-service.js';
+import { openSettlementDashboard } from './apps/settlement-dashboard.js';
+import { openDowntimeDashboard } from './apps/downtime-dashboard.js';
 
-Hooks.once("init", () => {
-  console.log("Kingmaker Toolkit | Initializing");
+Hooks.once('init', () => {
+  console.log('Kingmaker Toolkit | Initializing');
 });
 
-Hooks.once("ready", () => {
-  console.log("Kingmaker Toolkit | Ready");
+Hooks.once('ready', () => {
+  console.log('Kingmaker Toolkit | Ready');
 
   game.kingmakerToolkit = {
-    version: game.modules.get("kingmaker-toolkit")?.version ?? "unknown",
+    version: game.modules.get('kingmaker-toolkit')?.version ?? 'unknown',
 
     apps: {
-      openSettlementDashboard
+      openSettlementDashboard,
+      openDowntimeDashboard,
     },
 
     services: {
       kingdom: KingdomService,
       settlement: SettlementService,
-      focus: FocusService
+      focus: FocusService,
     },
 
     data: {},
-    utils: {}
+    utils: {},
   };
 });

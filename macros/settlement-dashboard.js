@@ -90,9 +90,7 @@ function getFocusLabel(focus) {
 function makeFocusOptions(currentFocus) {
   const empty = `<option value="" ${!currentFocus ? "selected" : ""}>Empty</option>`;
 
-  const options = FocusService.getNames()
-    .slice()
-    .sort((a, b) => a.localeCompare(b))
+  const options = FocusService.getSortedNames()
     .map(focus => `
       <option
         value="${focus}"

@@ -63,4 +63,10 @@ export class FocusService {
       ? `${focus.name} (${parts.join(", ")})`
       : focus.name;
   }
+
+  static getSortedNames() {
+    return this.getNames().sort((a, b) =>
+      a.localeCompare(b)
+    );
+  }
 }

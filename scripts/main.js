@@ -2,6 +2,8 @@
 
 import { KINGDOM_DC_BY_LEVEL } from "./data/kingdom-data.js";
 
+import { FOCI, FOCUS_IDS } from "./data/focus-data.js";
+
 import {
   SETTLEMENT_DEVELOPMENT_REQUIREMENTS,
   SETTLEMENT_TYPES

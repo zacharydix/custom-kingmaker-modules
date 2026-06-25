@@ -1,3 +1,7 @@
+/* -------------------------------------------------------------------------- */
+/* Settlement Hover                                                       */
+/* -------------------------------------------------------------------------- */
+
 .kingmaker-settlement-hover {
   position: fixed;
   z-index: 999999;
@@ -34,4 +38,33 @@
   font-size: 12px;
   opacity: 0.8;
   font-style: italic;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Downtime Chat Cards                                                        */
+/* -------------------------------------------------------------------------- */
+
+.downtime-additional-days-row {
+  margin-top: 8px;
+}
+
+.downtime-additional-days {
+  width: 70px;
+}
+
+.downtime-pay-earned-income {
+  margin-top: 6px;
+}
+
+.downtime-paid-label {
+  color: green;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shared                                                       */
+/* -------------------------------------------------------------------------- */
+
+.km-button-success {
+  color: green;
+  font-weight: bold;
 }

@@ -7,12 +7,58 @@ The toolkit should be easy to extend without duplicating rules or business logic
 The architecture intentionally follows a layered approach:
 
 ```
-UI
+Apps / Listeners
 ↓
+Services
+↓
+View Models
+↓
+Renderers
+↓
+DOM
+
 Services
 ↓
 Data
 ```
+
+---
+
+## Responsibilities
+
+Apps
+
+- Create Applications
+- Handle user interaction
+- Call services
+- Call renderers
+
+Listeners
+
+- Register hooks
+- Gather data
+- Call services
+- Call renderers
+
+Services
+
+- Business logic
+- Validation
+- Actor lookups
+- Calculations
+
+Renderers
+
+- Convert plain data into HTML
+- No Foundry dependencies
+- No actor lookups
+- No business logic
+
+Data
+
+- Constants
+- Tables
+- Metadata
 
 ---
 
@@ -100,6 +146,49 @@ main.js
 ```
 
 Listeners should register once and react to UI events.
+
+---
+
+## Renderers
+
+Location:
+
+scripts/renderers/
+
+Renderers convert prepared view models into HTML strings.
+
+Renderers should:
+
+- Accept plain JavaScript objects.
+- Return HTML strings.
+- Avoid Foundry dependencies.
+- Avoid actor lookups.
+- Avoid service calls.
+- Avoid business logic.
+
+Apps and listeners prepare the data. Renderers display it.
+
+---
+
+## Styles
+
+Location:
+
+styles/kingmaker-toolkit.css
+
+Use CSS classes instead of inline styles whenever possible.
+
+Shared utility classes should use:
+
+km-\*
+
+Feature-specific classes should use:
+
+downtime-_
+kingdom-_
+settlement-\*
+
+Inline styles are acceptable only for dynamic values, such as tooltip positioning.
 
 ---
 

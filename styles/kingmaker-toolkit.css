@@ -1,0 +1,82 @@
+/* -------------------------------------------------------------------------- */
+/* Settlement Hover                                                       */
+/* -------------------------------------------------------------------------- */
+
+.kingmaker-settlement-hover {
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+  background: rgba(20, 20, 20, 0.92);
+  color: #f0e6c8;
+  border: 1px solid #b99a45;
+  border-radius: 6px;
+  padding: 8px 10px;
+  max-width: 320px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+.kingmaker-settlement-hover-title {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.kingmaker-settlement-hover-divider {
+  margin: 8px 0 6px;
+  border-top: 1px solid rgba(240, 230, 200, 0.35);
+}
+
+.kingmaker-settlement-hover-focus {
+  margin-bottom: 8px;
+}
+
+.kingmaker-settlement-hover-focus-name {
+  font-weight: bold;
+}
+
+.kingmaker-settlement-hover-focus-description {
+  margin-left: 8px;
+  font-size: 12px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Downtime Dashboard                                                         */
+/* -------------------------------------------------------------------------- */
+
+.downtime-dashboard {
+  padding: 12px;
+}
+
+.downtime-earn-income-form {
+  margin-top: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Downtime Chat Cards                                                        */
+/* -------------------------------------------------------------------------- */
+
+.downtime-additional-days-row {
+  margin-top: 8px;
+}
+
+.downtime-additional-days {
+  width: 70px;
+}
+
+.downtime-pay-earned-income {
+  margin-top: 6px;
+}
+
+.downtime-paid-label {
+  color: green;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shared                                                       */
+/* -------------------------------------------------------------------------- */
+
+.km-button-success {
+  color: green;
+  font-weight: bold;
+}

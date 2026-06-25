@@ -4,6 +4,13 @@ import { EARN_INCOME_TASK_DCS, EARN_INCOME_TABLE } from '../data/earn-income-dat
 import { FocusService } from '../services/focus-service.js';
 import { KingdomService } from '../services/kingdom-service.js';
 import { SettlementService } from '../services/settlement-service.js';
+import {
+  renderEarnIncomeCard,
+  renderEarnIncomePaidPreview,
+  renderEarnIncomeTotalPreview,
+  renderPendingEarnIncomeCard,
+} from '../renderers/downtime/earn-income-chat-renderer.js';
+import { renderDowntimeDashboard } from '../renderers/downtime/dashboard-renderer.js';
 
 export async function openDowntimeDashboard() {
   // Paste the full current macros/downtime-dashboard.js body here.
@@ -161,28 +168,7 @@ export async function openDowntimeDashboard() {
   DowntimeSystem.postPendingEarnIncomeCard = async function (data) {
     const actor = game.actors.get(data.actorId);
 
-    const content = `
-        <div class="downtime-pending-earn-income"
-        data-actor-id="${data.actorId}"
-        data-skill-slug="${data.skillSlug}"
-        data-skill-label="${foundry.utils.escapeHTML(data.skillLabel)}"
-        data-skill-rank="${data.skillRank}"
-        data-proficiency-label="${data.proficiencyLabel}"
-        data-task-name="${foundry.utils.escapeHTML(data.taskName)}"
-        data-settlement-name="${foundry.utils.escapeHTML(data.settlementName)}"
-        data-task-level="${data.taskLevel}"
-        data-dc="${data.dc}"
-        data-matching-foci="${foundry.utils.escapeHTML(JSON.stringify(data.matchingFoci))}">
-        <h3>Pending Earn Income</h3>
-        <p><strong>Character:</strong> ${data.actorName}</p>
-        <p><strong>Skill:</strong> ${data.skillLabel} (${data.proficiencyLabel})</p>
-        <p><strong>Task Level:</strong> ${data.taskLevel}</p>
-        <p><strong>DC:</strong> ${data.dc}</p>
-        <p><em>Resolve any Hero Point rerolls first, then click Calculate Earn Income.</em></p>
-
-        <div class="downtime-pending-earned-income-actions"></div>
-        </div>
-    `;
+    const content = renderPendingEarnIncomeCard(data);
 
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
@@ -195,53 +181,12 @@ export async function openDowntimeDashboard() {
     const actor = game.actors.get(data.actorId);
     const balance = DowntimeSystem.getBalanceText(actor);
 
-    const matchingFoci = data.matchingFoci.length ? data.matchingFoci.join(', ') : 'None';
-
-    const content = `
-        <div class="downtime-earn-income-card"
-        data-actor-id="${data.actorId}"
-        data-daily-income-cp="${data.dailyIncomeCp}">
-        <h2>Earn Income</h2>
-
-        <p><strong>Character:</strong> ${data.actorName}</p>
-        <p><strong>Skill:</strong> ${data.skillLabel} (${data.proficiencyLabel})</p>
-        <p><strong>Task:</strong> ${data.taskName || 'Unnamed Task'}</p>
-        <p><strong>Settlement:</strong> ${data.settlementName || 'None'}</p>
-
-        <hr>
-
-        <p><strong>Task Level:</strong> ${data.taskLevel}</p>
-        <p><strong>DC:</strong> ${data.dc}</p>
-        <p><strong>Roll:</strong> ${data.die} + ${data.modifier} = <strong>${data.total}</strong></p>
-        <p><strong>Result:</strong> ${data.degree}</p>
-
-        <hr>
-
-        <p><strong>Daily Income:</strong> ${DowntimeSystem.formatCoins(data.dailyIncomeCp)}</p>
-        <p><strong>Current Balance:</strong> ${balance}</p>
-        <p><strong>Matching Foci:</strong> ${matchingFoci}</p>
-
-        <div style="margin-top: 8px;">
-            <label><strong>Additional Days Worked:</strong></label>
-            <input type="number"
-            class="downtime-additional-days"
-            value="0"
-            min="0"
-            max="364"
-            style="width: 70px;" />
-        </div>
-
-        <p class="downtime-total-preview">
-            <strong>Total if paid now:</strong> ${DowntimeSystem.formatCoins(data.dailyIncomeCp)}
-        </p>
-
-        <button type="button"
-            class="downtime-pay-earned-income"
-            style="margin-top: 6px;">
-            Pay Character
-        </button>
-        </div>
-    `;
+    const content = renderEarnIncomeCard({
+      ...data,
+      balance,
+      dailyIncomeText: DowntimeSystem.formatCoins(data.dailyIncomeCp),
+      matchingFociText: data.matchingFoci.length ? data.matchingFoci.join(', ') : 'None',
+    });
 
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
@@ -272,7 +217,10 @@ export async function openDowntimeDashboard() {
         const totalDays = 1 + extraDays;
         const totalCp = dailyIncomeCp * totalDays;
 
-        preview.innerHTML = `<strong>Total if paid now:</strong> ${DowntimeSystem.formatCoins(totalCp)} (${totalDays} day${totalDays === 1 ? '' : 's'})`;
+        preview.innerHTML = renderEarnIncomeTotalPreview({
+          totalIncomeText: DowntimeSystem.formatCoins(totalCp),
+          totalDays,
+        });
       };
 
       input?.addEventListener('input', updatePreview);
@@ -292,12 +240,15 @@ export async function openDowntimeDashboard() {
 
         payButton.disabled = true;
         payButton.textContent = 'Paid ✔';
-        payButton.style.color = 'green';
-        payButton.style.fontWeight = 'bold';
+        payButton.classList.add('km-button-success');
 
         if (input) input.disabled = true;
 
-        preview.innerHTML = `<strong style="color: green;">Paid:</strong> ${DowntimeSystem.formatCoins(totalCp)} (${totalDays} day${totalDays === 1 ? '' : 's'})<br><strong>New Balance:</strong> ${DowntimeSystem.getBalanceText(actor)}`;
+        preview.innerHTML = renderEarnIncomePaidPreview({
+          totalIncomeText: DowntimeSystem.formatCoins(totalCp),
+          totalDays,
+          newBalance: DowntimeSystem.getBalanceText(actor),
+        });
 
         await message.update({ content: card.outerHTML });
       });
@@ -371,8 +322,7 @@ export async function openDowntimeDashboard() {
 
         button.disabled = true;
         button.textContent = 'Calculated ✔';
-        button.style.color = 'green';
-        button.style.fontWeight = 'bold';
+        button.classList.add('km-button-success');
 
         await message.update({ content: card.outerHTML });
       });
@@ -405,17 +355,13 @@ export async function openDowntimeDashboard() {
       const actor = this.actor;
 
       if (!actor) {
-        return $(`
-            <div style="padding: 12px;">
-            <h2>Downtime Dashboard</h2>
-            <p>Please select a character token or assign yourself a character.</p>
-            </div>
-        `);
+        return $(renderDowntimeDashboard({ actorName: null }));
       }
 
       const skills = DowntimeSystem.getTrainedSkills(actor);
       const settlements = SettlementService.getAllSettlements();
       const selectedSkill = skills[0];
+
       const defaultTaskLevel = DowntimeSystem.getDefaultTaskLevel(
         actor,
         null,
@@ -435,56 +381,15 @@ export async function openDowntimeDashboard() {
         ...settlements.map((s) => `<option value="${s.id}">${s.name}</option>`),
       ].join('');
 
-      return $(`
-        <div style="padding: 12px;">
-            <h2>Downtime Dashboard</h2>
-            <p><strong>Character:</strong> ${actor.name}</p>
-
-            <hr>
-
-            <h3>Available Activities</h3>
-
-            <details open>
-            <summary><strong>Earn Income</strong></summary>
-
-            <form class="earn-income-form" style="margin-top: 8px;">
-                <div class="form-group">
-                <label>Skill</label>
-                <select name="skillSlug">${skillOptions}</select>
-                </div>
-
-                <div class="form-group">
-                <label>Settlement</label>
-                <select name="settlementId">${settlementOptions}</select>
-                </div>
-
-                <div class="form-group">
-                <label>Task Name</label>
-                <input type="text" name="taskName" placeholder="Scribe scrolls, perform at tavern, repair wagons..." />
-                </div>
-
-                <div class="form-group">
-                <label>Task Level</label>
-                <input type="number" name="taskLevel" value="${defaultTaskLevel}" min="0" max="20" />
-                </div>
-
-                <div class="form-group">
-                <label>DC</label>
-                <input type="number" name="dc" value="${DowntimeSystem.TASK_DCS[defaultTaskLevel]}" min="0" />
-                </div>
-
-                <p class="focus-preview"><em>Select a settlement and skill to preview matching Foci.</em></p>
-
-                <button type="submit">Roll Earn Income</button>
-            </form>
-            </details>
-
-            <hr>
-
-            <h3>Coming Soon</h3>
-            <button disabled>Craft</button>
-        </div>
-        `);
+      return $(
+        renderDowntimeDashboard({
+          actorName: actor.name,
+          skillOptions,
+          settlementOptions,
+          defaultTaskLevel,
+          defaultDc: DowntimeSystem.TASK_DCS[defaultTaskLevel],
+        })
+      );
     }
 
     activateListeners(html) {
@@ -580,7 +485,7 @@ export async function openDowntimeDashboard() {
         const matchingFoci = DowntimeSystem.getMatchingFoci(settlement, skillSlug, skill);
         const focusBonus = matchingFoci.length ? 3 : 0;
 
-        const kingdomLevel = KingdomService.getKingdomLevel();
+        const kingdomLevel = KingdomService.getLevel();
         if (settlement && matchingFoci.length && taskLevel > kingdomLevel) {
           ui.notifications.warn(
             `This Focus allows jobs up to kingdom level ${kingdomLevel}. Task level ${taskLevel} is above that.`

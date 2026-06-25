@@ -1,117 +1,123 @@
-# Next Session Notes
+# Next Session
 
 ## Current Status
 
+The **Renderer Refactor** has been completed and merged.
+
 ### Completed
 
-- Module architecture established.
-- Shared data layer created.
-- Shared service layer created.
-- Settlement Dashboard migrated into module.
-- Downtime Dashboard migrated into module.
-- Kingdom Dashboard migrated into module.
-- Kingdom listeners migrated into module.
-- Legacy Kingdom autoloader removed.
+- Introduced the **Renderers** layer to the toolkit architecture.
+- Refactored Settlement Hover into a dedicated renderer.
+- Refactored Earn Income chat cards into dedicated renderers.
+- Refactored the Downtime Dashboard HTML into a dedicated renderer.
+- Moved presentation styling into `kingmaker-toolkit.css`.
+- Introduced shared CSS utility classes (e.g. `km-button-success`).
+- Updated architecture documentation to include Renderers, View Models, and CSS conventions.
 
-### Current Public API
+The project architecture is now:
 
-```js
-game.kingmakerToolkit.apps.openKingdomDashboard();
-game.kingmakerToolkit.apps.openSettlementDashboard();
-game.kingmakerToolkit.apps.openDowntimeDashboard();
-
-game.kingmakerToolkit.services.kingdom;
-game.kingmakerToolkit.services.settlement;
-game.kingmakerToolkit.services.focus;
 ```
+Apps / Listeners
+        ↓
+     Services
+        ↓
+    View Models
+        ↓
+     Renderers
+        ↓
+        CSS
+
+Services
+        ↓
+       Data
+```
+
+This architecture should be considered the standard for future development.
 
 ---
 
-## Current Architecture
+# Next Priority
 
-```
-Apps
-    ↓
-Services
-    ↓
-Shared Data
-```
+Continue migrating existing UI to the new renderer architecture where appropriate.
 
-### Apps
+Good candidates include:
 
 - Kingdom Dashboard
 - Settlement Dashboard
-- Downtime Dashboard
-
-### Services
-
-- KingdomService
-- SettlementService
-- FocusService
-
-### Data
-
-- kingdom-data.js
-- settlement-data.js
-- focus-data.js
-- earn-income-data.js
-
-### Listeners
-
-- kingdom-listeners.js
+- Kingdom Activity chat cards
+- Army management UI
+- Future journal rendering
 
 ---
 
-## Current Development Philosophy
+# Open Architecture Issue
 
-- Keep issues small.
-- Preserve existing behavior during migrations.
-- Migrate first.
-- Refactor second.
-- Avoid redesigning while migrating.
-- UI should contain as little business logic as practical.
+A backlog issue has been created for **Shared Renderer Utilities**.
 
----
+Do **not** implement this yet.
 
-## Current Roadmap
+Shared utilities should only be introduced once duplication naturally appears across multiple renderers.
 
-### Completed
+Current philosophy:
 
-✅ Module foundation
-
-✅ Shared data
-
-✅ Shared services
-
-✅ Settlement Dashboard
-
-✅ Downtime Dashboard
-
-✅ Kingdom Dashboard
-
-✅ Kingdom listeners
+> Don't abstract until the third use.
 
 ---
 
-### Next Candidates
+# Development Conventions
 
-- Settlement listeners
-- EarnIncomeService
-- Kingdom activity refactor
-- Unified Toolkit Dashboard
-- ApplicationV2 migration
-- Unit tests
+## Renderers
+
+Renderers should:
+
+- Accept plain JavaScript objects (View Models)
+- Return HTML strings
+- Perform no actor lookups
+- Perform no service calls
+- Perform no business logic
+- Focus only on presentation
+
+## CSS
+
+Shared utility classes:
+
+```
+km-*
+```
+
+Feature-specific classes:
+
+```
+downtime-*
+kingdom-*
+settlement-*
+army-*
+```
+
+Avoid inline styling except for dynamic positioning (such as tooltips).
 
 ---
 
-## Notes
+# Potential Next Feature
 
-The project has transitioned from a collection of macros into a real Foundry module.
+Resume feature development after the renderer refactor.
 
-New features should follow the architecture:
+Possible directions:
 
-UI
-↓
-Services
-↓
-Data
+- Kingdom Dashboard improvements
+- Settlement Dashboard improvements
+- Additional Downtime activities (Craft, Retrain)
+- Army management
+- Kingdom journal generation
+
+Choose based on current project priorities rather than architectural work.
+
+---
+
+# Notes
+
+This refactor establishes the long-term architecture of the Kingmaker Toolkit.
+
+Future work should prefer extending this architecture rather than introducing new patterns.
+
+The goal is to keep Applications and Listeners responsible for orchestration, Services responsible for business logic, Renderers responsible for presentation, and CSS responsible for styling.
